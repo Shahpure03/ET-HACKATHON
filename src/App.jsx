@@ -142,23 +142,53 @@ const NEWS_DATA = [
 ];
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState('profile'); // 'profile', 'feed', 'insight'
+  const [currentScreen, setCurrentScreen] = useState('landing'); // 'landing', 'profile', 'feed', 'insight'
   const [profile, setProfile] = useState(null);
   const [selectedArticleId, setSelectedArticleId] = useState(null);
   const [lang, setLang] = useState('en');
 
+  React.useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.slice(1);
+      if (['landing', 'profile', 'feed', 'insight'].includes(hash)) {
+        setCurrentScreen(hash);
+      } else {
+        window.location.hash = 'landing';
+        setCurrentScreen('landing');
+      }
+    };
+    
+    // Check initial hash
+    if (!window.location.hash) {
+      window.location.hash = 'landing';
+    } else {
+      handleHash();
+    }
+
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const navigate = (screen) => {
+    window.location.hash = screen;
+    setCurrentScreen(screen);
+  };
+
   const handleProfileSelect = (selectedProfile) => {
     setProfile(selectedProfile);
-    setCurrentScreen('feed');
+    navigate('feed');
   };
 
   const handleArticleSelect = (articleId) => {
     setSelectedArticleId(articleId);
-    setCurrentScreen('insight');
+    navigate('insight');
   };
 
   return (
     <div className="app-container">
+      {currentScreen === 'landing' && (
+        <LandingScreen onEnter={() => navigate('profile')} lang={lang} />
+      )}
       {currentScreen === 'profile' && (
         <ProfileSelection onSelect={handleProfileSelect} lang={lang} />
       )}
@@ -166,7 +196,7 @@ export default function App() {
         <FeedScreen 
           profile={profile} 
           lang={lang}
-          onProfileClick={() => setCurrentScreen('profile')}
+          onProfileClick={() => navigate('profile')}
           onArticleClick={handleArticleSelect} 
         />
       )}
@@ -176,9 +206,48 @@ export default function App() {
           profile={profile}
           lang={lang}
           setLang={setLang}
-          onBack={() => setCurrentScreen('feed')} 
+          onBack={() => navigate('feed')} 
         />
       )}
+    </div>
+  );
+}
+
+function LandingScreen({ onEnter, lang }) {
+  return (
+    <div className="fade-in flex flex-col items-center justify-center p-4" style={{ minHeight: '100vh', background: 'var(--primary-color)', color: 'white' }}>
+      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <h1 style={{ fontSize: '3rem', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '1rem', fontFamily: 'Georgia, serif' }}>
+          ET Insights AI
+        </h1>
+        <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>
+          {lang === 'en' ? 'Smarter News For A Faster World' : 'तेज़ दुनिया के लिए अधिक स्मार्ट समाचार'}
+        </p>
+      </div>
+      
+      <button 
+        onClick={onEnter}
+        style={{
+          background: 'white',
+          color: 'var(--primary-color)',
+          padding: '1rem 2.5rem',
+          fontSize: '1.2rem',
+          fontWeight: 'bold',
+          border: 'none',
+          borderRadius: '50px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          transition: 'transform 0.2s',
+        }}
+        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        {lang === 'en' ? 'Get Started' : 'शुरू करें'}
+        <ChevronRight size={20} />
+      </button>
     </div>
   );
 }

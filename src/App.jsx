@@ -84,7 +84,7 @@ const NEWS_DATA = [
     summary: 'Generative AI adoption accelerates automation across major tech firms.',
     hindiSummary: 'जनरेटिव AI को अपनाने से प्रमुख टेक कंपनियों में ऑटोमेशन में तेजी।',
     image: '/ai.png',
-    audioSrc: 'https://www.w3schools.com/html/horse.mp3', // default fake audio fallback
+    audioSrc: '', // default fake audio fallback
     videoSrc: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-network-of-connections-3151-large.mp4',
     isImportant: false,
     impactChain: [
